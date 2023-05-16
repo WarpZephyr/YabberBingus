@@ -439,25 +439,28 @@ namespace Yabber
                 case MQB.CustomData.DataType.Float: return Convert.ToSingle(value);
                 case MQB.CustomData.DataType.String: return str;
                 case MQB.CustomData.DataType.Custom: return (byte[])value;
-                case MQB.CustomData.DataType.Color: return ConvertValueToColor(value);
+                case MQB.CustomData.DataType.Color: return str.ToColor();
                 case MQB.CustomData.DataType.Vector3: return str.ToVector3();
                 default: throw new NotImplementedException($"Unimplemented custom data type: {type}");
             }
         }
 
-        public static object ConvertValueToColor(object value)
+        public static object ToColor(this string str)
         {
-            string invalidChars = ",] ";
-            string str = value.ToString();
-            string alphaStr = str.Substring(str.IndexOf("A=") + 2, 3).TrimEnd(invalidChars.ToCharArray());
-            string redStr = str.Substring(str.IndexOf("R=") + 2, 3).TrimEnd(invalidChars.ToCharArray());
-            string greenStr = str.Substring(str.IndexOf("G=") + 2, 3).TrimEnd(invalidChars.ToCharArray());
-            string blueStr = str.Substring(str.IndexOf("B=") + 2, 3).TrimEnd(invalidChars.ToCharArray());
+            int aStartIndex = str.IndexOf("A=") + 2;
+            int rStartIndex = str.IndexOf("R=") + 2;
+            int gStartIndex = str.IndexOf("G=") + 2;
+            int bStartIndex = str.IndexOf("B=") + 2;
 
-            int alpha = int.Parse(alphaStr);
-            int red = int.Parse(redStr);
-            int green = int.Parse(greenStr);
-            int blue = int.Parse(blueStr);
+            string aStr = str.Substring(aStartIndex, rStartIndex - aStartIndex - 4);
+            string rStr = str.Substring(rStartIndex, gStartIndex - rStartIndex - 4);
+            string gStr = str.Substring(gStartIndex, bStartIndex - gStartIndex - 4);
+            string bStr = str.Substring(bStartIndex, str.Length - bStartIndex - 1);
+
+            int alpha = int.Parse(aStr);
+            int red = int.Parse(rStr);
+            int green = int.Parse(gStr);
+            int blue = int.Parse(bStr);
             return Color.FromArgb(alpha, red, green, blue);
         }
 
